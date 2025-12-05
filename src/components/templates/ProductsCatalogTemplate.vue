@@ -7,6 +7,7 @@ import SearchBar from "@/components/atoms/SearchBar.vue";
 import NoResults from "@/components/atoms/NoResults.vue";
 import CategoryFilter from "@/components/atoms/CategoryFilter.vue";
 import ManufacturerFilter from "@/components/atoms/ManufacturerFilter.vue";
+import PriceRangeFilter from "@/components/atoms/PriceRangeFilter.vue";
 
 // interfaces
 import type { Product } from "@/interfaces/Product.ts";
@@ -20,6 +21,10 @@ const props = defineProps<Props>();
 const searchQuery = ref("");
 const selectedCategory = ref("all");
 const selectedManufacturer = ref("all");
+const priceRange = ref({
+  min: 0,
+  max: 1000000,
+});
 
 const categories = computed(() => {
   return ["all", ...new Set(props.productsCatalog.map((p) => p.category))].sort(
@@ -39,8 +44,19 @@ const parseQueryParams = () => {
   const search = url.searchParams.get("search") || "";
   const category = url.searchParams.get("category") || "all";
   const manufacturer = url.searchParams.get("manufacturer") || "all";
+  const priceMin = url.searchParams.get("priceMin")
+    ? Number(url.searchParams.get("priceMin"))
+    : 0;
+  const priceMax = url.searchParams.get("priceMax")
+    ? Number(url.searchParams.get("priceMax"))
+    : 1000000;
 
-  return { search, category, manufacturer };
+  return {
+    search,
+    category,
+    manufacturer,
+    priceRange: { min: priceMin, max: priceMax },
+  };
 };
 
 const updateURL = () => {
@@ -64,6 +80,18 @@ const updateURL = () => {
     url.searchParams.delete("manufacturer");
   }
 
+  if (priceRange.value.min !== 0) {
+    url.searchParams.set("priceMin", priceRange.value.min.toString());
+  } else {
+    url.searchParams.delete("priceMin");
+  }
+
+  if (priceRange.value.max !== 1000000) {
+    url.searchParams.set("priceMax", priceRange.value.max.toString());
+  } else {
+    url.searchParams.delete("priceMax");
+  }
+
   window.history.pushState({}, "", url.toString());
 };
 
@@ -72,6 +100,7 @@ onMounted(() => {
   searchQuery.value = params.search;
   selectedCategory.value = params.category;
   selectedManufacturer.value = params.manufacturer;
+  priceRange.value = params.priceRange;
 
   window.addEventListener("popstate", handlePopState);
 });
@@ -85,11 +114,12 @@ const handlePopState = () => {
   searchQuery.value = params.search;
   selectedCategory.value = params.category;
   selectedManufacturer.value = params.manufacturer;
+  priceRange.value = params.priceRange;
 };
 
-watch([searchQuery, selectedCategory, selectedManufacturer], () => {
+watch([searchQuery, selectedCategory, selectedManufacturer, priceRange], () => {
   updateURL();
-});
+}, { deep: true });
 
 const filteredProducts = computed(() => {
   let products = props.productsCatalog;
@@ -105,6 +135,12 @@ const filteredProducts = computed(() => {
       (product) => product.manufacturer === selectedManufacturer.value
     );
   }
+
+  products = products.filter(
+    (product) =>
+      product.price >= priceRange.value.min &&
+      product.price <= priceRange.value.max
+  );
 
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
@@ -137,6 +173,12 @@ const filteredProducts = computed(() => {
       <ManufacturerFilter
         v-model="selectedManufacturer"
         :manufacturers="manufacturers"
+      />
+
+      <PriceRangeFilter
+        v-model="priceRange"
+        :min-price="0"
+        :max-price="1000000"
       />
 
       <div
