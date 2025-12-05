@@ -19,17 +19,37 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const searchQuery = ref("");
-const selectedCategory = ref("all");
-const selectedManufacturer = ref("all");
+const initializeFromURL = () => {
+  const url = new URL(window.location.href);
+  return {
+    search: url.searchParams.get("search") || "",
+    category: url.searchParams.get("category") || "all",
+    manufacturer: url.searchParams.get("manufacturer") || "all",
+    priceMin: url.searchParams.get("priceMin")
+      ? Number(url.searchParams.get("priceMin"))
+      : null,
+    priceMax: url.searchParams.get("priceMax")
+      ? Number(url.searchParams.get("priceMax"))
+      : null,
+    page: url.searchParams.get("page")
+      ? Number(url.searchParams.get("page"))
+      : 1,
+  };
+};
+
+const initialParams = initializeFromURL();
+
+const searchQuery = ref(initialParams.search);
+const selectedCategory = ref(initialParams.category);
+const selectedManufacturer = ref(initialParams.manufacturer);
 const priceRange = ref<{
   min: number | null;
   max: number | null;
 }>({
-  min: null,
-  max: null,
+  min: initialParams.priceMin,
+  max: initialParams.priceMax,
 });
-const currentPage = ref(1);
+const currentPage = ref(initialParams.page);
 const itemsPerPage = 12;
 
 const categories = computed(() => {
@@ -45,29 +65,6 @@ const manufacturers = computed(() => {
   ].sort((a, b) => (a === "all" ? -1 : b === "all" ? 1 : a.localeCompare(b)));
 });
 
-const parseQueryParams = () => {
-  const url = new URL(window.location.href);
-  const search = url.searchParams.get("search") || "";
-  const category = url.searchParams.get("category") || "all";
-  const manufacturer = url.searchParams.get("manufacturer") || "all";
-  const priceMin = url.searchParams.get("priceMin")
-    ? Number(url.searchParams.get("priceMin"))
-    : null;
-  const priceMax = url.searchParams.get("priceMax")
-    ? Number(url.searchParams.get("priceMax"))
-    : null;
-  const page = url.searchParams.get("page")
-    ? Number(url.searchParams.get("page"))
-    : 1;
-
-  return {
-    search,
-    category,
-    manufacturer,
-    priceRange: { min: priceMin, max: priceMax },
-    page,
-  };
-};
 
 const updateURL = () => {
   const url = new URL(window.location.href);
@@ -112,13 +109,6 @@ const updateURL = () => {
 };
 
 onMounted(() => {
-  const params = parseQueryParams();
-  searchQuery.value = params.search;
-  selectedCategory.value = params.category;
-  selectedManufacturer.value = params.manufacturer;
-  priceRange.value = params.priceRange;
-  currentPage.value = params.page;
-
   window.addEventListener("popstate", handlePopState);
 });
 
@@ -127,11 +117,14 @@ onUnmounted(() => {
 });
 
 const handlePopState = () => {
-  const params = parseQueryParams();
+  const params = initializeFromURL();
   searchQuery.value = params.search;
   selectedCategory.value = params.category;
   selectedManufacturer.value = params.manufacturer;
-  priceRange.value = params.priceRange;
+  priceRange.value = {
+    min: params.priceMin,
+    max: params.priceMax,
+  };
   currentPage.value = params.page;
 };
 

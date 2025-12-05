@@ -53,7 +53,7 @@ const props = defineProps<Props>();
 }
 
 .product-name {
-  @apply text-xl font-bold text-gray-900 flex-1 min-w-0 hover:text-blue-600 transition-colors duration-200 md:text-2xl;
+  @apply text-xl font-bold text-gray-900 flex-1 min-w-0 transition-colors duration-200 md:text-2xl;
 }
 
 .product-category {
