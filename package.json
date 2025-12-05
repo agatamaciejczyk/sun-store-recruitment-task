@@ -4,13 +4,10 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "20.16.0",
-    "yarn": "4.3.1"
+    "node": "20.19.4"
   },
-  "packageManager": "yarn@4.3.1",
   "volta": {
-    "node": "20.16.0",
-    "yarn": "4.3.1"
+    "node": "20.19.4"
   },
   "scripts": {
     "dev": "vite",
