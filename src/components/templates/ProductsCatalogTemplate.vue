@@ -176,34 +176,40 @@ const filteredProducts = computed(() => {
         :results-count="filteredProducts.length"
       />
 
-      <CategoryFilter
-        v-model="selectedCategory"
-        :categories="categories"
-      />
+      <div class="catalog-layout">
+        <aside class="filters-sidebar">
+          <CategoryFilter
+            v-model="selectedCategory"
+            :categories="categories"
+          />
 
-      <ManufacturerFilter
-        v-model="selectedManufacturer"
-        :manufacturers="manufacturers"
-      />
+          <ManufacturerFilter
+            v-model="selectedManufacturer"
+            :manufacturers="manufacturers"
+          />
 
-      <PriceRangeFilter
-        v-model="priceRange"
-        :min-price="0"
-        :max-price="1000000"
-      />
+          <PriceRangeFilter
+            v-model="priceRange"
+            :min-price="0"
+            :max-price="1000000"
+          />
+        </aside>
 
-      <div
-        v-if="filteredProducts.length > 0"
-        class="products-catalog-grid"
-      >
-        <ProductCard
-          v-for="(product, index) in filteredProducts"
-          :key="`product-card--${index}`"
-          :product="product"
-        />
+        <div class="products-section">
+          <div
+            v-if="filteredProducts.length > 0"
+            class="products-catalog-grid"
+          >
+            <ProductCard
+              v-for="(product, index) in filteredProducts"
+              :key="`product-card--${index}`"
+              :product="product"
+            />
+          </div>
+
+          <NoResults v-else />
+        </div>
       </div>
-
-      <NoResults v-else />
     </div>
   </div>
 </template>
@@ -211,6 +217,18 @@ const filteredProducts = computed(() => {
 <style scoped>
 .products-catalog {
   @apply min-h-screen bg-gray-50 py-16 px-4;
+}
+
+.catalog-layout {
+  @apply flex flex-col lg:flex-row gap-6;
+}
+
+.filters-sidebar {
+  @apply w-full lg:w-80 flex-shrink-0;
+}
+
+.products-section {
+  @apply flex-1 min-w-0;
 }
 
 .products-catalog-grid {
