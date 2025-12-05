@@ -16,8 +16,8 @@ onMounted(() => {
   Papa.parse('/products.csv', {
     download: true,
     header: true,
-    complete: function(results) {
-      productsCatalog.value = results.data;
+    complete: ({ data }: { data: Product[] }) => {
+      productsCatalog.value = data;
     }
   });
 });
