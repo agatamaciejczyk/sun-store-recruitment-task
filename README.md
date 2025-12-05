@@ -1,54 +1,60 @@
-# sun-store-recruitment-task
+# sun.store - Product Catalog
 
-This template should help get you started developing with Vue 3 in Vite.
+A modern, responsive product catalog application built with Vue 3, TypeScript, and Tailwind CSS. Features advanced filtering, search functionality, and persistent URL-based state management.
 
-## Recommended IDE Setup
+## Live Demo
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+**[https://sun-store-recruitment-task.vercel.app/](https://sun-store-recruitment-task.vercel.app/)**
 
-## Recommended Browser Setup
+## Features
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- **Product Display**: Clean card-based layout showing product details (name, category, manufacturer, description, price)
+- **Search**: Real-time search across product name, manufacturer, and description
+- **Filters**:
+  - Category filter with button-based selection
+  - Manufacturer filter
+  - Price range filter (min/max inputs with reset functionality)
+- **Pagination**: Smart pagination with ellipsis, mobile-responsive design
+- **URL State Management**: All filters and pagination state persist in URL query parameters
+- **Responsive Design**: Mobile-first approach with sidebar on desktop, stacked layout on mobile
+- **Sorting**: Products automatically sorted by price (lowest to highest)
 
-## Type Support for `.vue` Imports in TS
+## Tech Stack
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- **Vue 3**: Composition API with `<script setup>` syntax
+- **TypeScript**: Full type safety 
+- **Tailwind CSS**: Utility-first styling with custom components
+- **Vite**: Fast build tool and dev server
+- **PapaParse**: CSV data parsing
+- **Lucide Vue Next**: Modern icon library
+- **Vitest**: Unit testing framework
 
-## Customize configuration
+## Installation
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### Prerequisites
 
-## Project Setup
+- Node.js 20.19.4
+
+### Setup
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Development
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### Build for Production
 
 ```sh
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### Preview Production Build
 
 ```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+npm run preview
 ```
