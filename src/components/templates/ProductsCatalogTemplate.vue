@@ -21,9 +21,12 @@ const props = defineProps<Props>();
 const searchQuery = ref("");
 const selectedCategory = ref("all");
 const selectedManufacturer = ref("all");
-const priceRange = ref({
-  min: 0,
-  max: 1000000,
+const priceRange = ref<{
+  min: number | null;
+  max: number | null;
+}>({
+  min: null,
+  max: null,
 });
 
 const categories = computed(() => {
@@ -46,10 +49,10 @@ const parseQueryParams = () => {
   const manufacturer = url.searchParams.get("manufacturer") || "all";
   const priceMin = url.searchParams.get("priceMin")
     ? Number(url.searchParams.get("priceMin"))
-    : 0;
+    : null;
   const priceMax = url.searchParams.get("priceMax")
     ? Number(url.searchParams.get("priceMax"))
-    : 1000000;
+    : null;
 
   return {
     search,
@@ -80,13 +83,13 @@ const updateURL = () => {
     url.searchParams.delete("manufacturer");
   }
 
-  if (priceRange.value.min !== 0) {
+  if (priceRange.value.min !== null) {
     url.searchParams.set("priceMin", priceRange.value.min.toString());
   } else {
     url.searchParams.delete("priceMin");
   }
 
-  if (priceRange.value.max !== 1000000) {
+  if (priceRange.value.max !== null) {
     url.searchParams.set("priceMax", priceRange.value.max.toString());
   } else {
     url.searchParams.delete("priceMax");
@@ -136,11 +139,17 @@ const filteredProducts = computed(() => {
     );
   }
 
-  products = products.filter(
-    (product) =>
-      product.price >= priceRange.value.min &&
-      product.price <= priceRange.value.max
-  );
+  if (priceRange.value.min !== null) {
+    products = products.filter(
+      (product) => product.price >= priceRange.value.min!
+    );
+  }
+
+  if (priceRange.value.max !== null) {
+    products = products.filter(
+      (product) => product.price <= priceRange.value.max!
+    );
+  }
 
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
@@ -151,6 +160,8 @@ const filteredProducts = computed(() => {
         product.description.toLowerCase().includes(query)
     );
   }
+
+  products.sort((a, b) => a.price - b.price);
 
   return products;
 });
