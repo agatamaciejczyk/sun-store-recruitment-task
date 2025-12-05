@@ -6,6 +6,7 @@ import ProductCard from "@/components/atoms/ProductCard.vue";
 import SearchBar from "@/components/atoms/SearchBar.vue";
 import NoResults from "@/components/atoms/NoResults.vue";
 import CategoryFilter from "@/components/atoms/CategoryFilter.vue";
+import ManufacturerFilter from "@/components/atoms/ManufacturerFilter.vue";
 
 // interfaces
 import type { Product } from "@/interfaces/Product.ts";
@@ -18,6 +19,7 @@ const props = defineProps<Props>();
 
 const searchQuery = ref("");
 const selectedCategory = ref("all");
+const selectedManufacturer = ref("all");
 
 const categories = computed(() => {
   return ["all", ...new Set(props.productsCatalog.map((p) => p.category))].sort(
@@ -25,12 +27,20 @@ const categories = computed(() => {
   );
 });
 
+const manufacturers = computed(() => {
+  return [
+    "all",
+    ...new Set(props.productsCatalog.map((p) => p.manufacturer)),
+  ].sort((a, b) => (a === "all" ? -1 : b === "all" ? 1 : a.localeCompare(b)));
+});
+
 const parseQueryParams = () => {
   const url = new URL(window.location.href);
   const search = url.searchParams.get("search") || "";
   const category = url.searchParams.get("category") || "all";
+  const manufacturer = url.searchParams.get("manufacturer") || "all";
 
-  return { search, category };
+  return { search, category, manufacturer };
 };
 
 const updateURL = () => {
@@ -48,6 +58,12 @@ const updateURL = () => {
     url.searchParams.delete("category");
   }
 
+  if (selectedManufacturer.value !== "all") {
+    url.searchParams.set("manufacturer", selectedManufacturer.value);
+  } else {
+    url.searchParams.delete("manufacturer");
+  }
+
   window.history.pushState({}, "", url.toString());
 };
 
@@ -55,6 +71,7 @@ onMounted(() => {
   const params = parseQueryParams();
   searchQuery.value = params.search;
   selectedCategory.value = params.category;
+  selectedManufacturer.value = params.manufacturer;
 
   window.addEventListener("popstate", handlePopState);
 });
@@ -67,9 +84,10 @@ const handlePopState = () => {
   const params = parseQueryParams();
   searchQuery.value = params.search;
   selectedCategory.value = params.category;
+  selectedManufacturer.value = params.manufacturer;
 };
 
-watch([searchQuery, selectedCategory], () => {
+watch([searchQuery, selectedCategory, selectedManufacturer], () => {
   updateURL();
 });
 
@@ -79,6 +97,12 @@ const filteredProducts = computed(() => {
   if (selectedCategory.value !== "all") {
     products = products.filter(
       (product) => product.category === selectedCategory.value
+    );
+  }
+
+  if (selectedManufacturer.value !== "all") {
+    products = products.filter(
+      (product) => product.manufacturer === selectedManufacturer.value
     );
   }
 
@@ -108,6 +132,11 @@ const filteredProducts = computed(() => {
       <CategoryFilter
         v-model="selectedCategory"
         :categories="categories"
+      />
+
+      <ManufacturerFilter
+        v-model="selectedManufacturer"
+        :manufacturers="manufacturers"
       />
 
       <div
