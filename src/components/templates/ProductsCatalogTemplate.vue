@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 
 // components
 import ProductCard from "@/components/atoms/ProductCard.vue";
 import SearchBar from "@/components/atoms/SearchBar.vue";
-import NoResults from '@/components/atoms/NoResults.vue';
+import NoResults from "@/components/atoms/NoResults.vue";
+import CategoryFilter from "@/components/atoms/CategoryFilter.vue";
 
 // interfaces
 import type { Product } from "@/interfaces/Product.ts";
@@ -16,21 +17,82 @@ interface Props {
 const props = defineProps<Props>();
 
 const searchQuery = ref("");
+const selectedCategory = ref("all");
 
-const filteredProducts = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return props.productsCatalog;
+const categories = computed(() => {
+  return ["all", ...new Set(props.productsCatalog.map((p) => p.category))].sort(
+    (a, b) => (a === "all" ? -1 : b === "all" ? 1 : a.localeCompare(b))
+  );
+});
+
+const parseQueryParams = () => {
+  const url = new URL(window.location.href);
+  const search = url.searchParams.get("search") || "";
+  const category = url.searchParams.get("category") || "all";
+
+  return { search, category };
+};
+
+const updateURL = () => {
+  const url = new URL(window.location.href);
+
+  if (searchQuery.value.trim()) {
+    url.searchParams.set("search", searchQuery.value);
+  } else {
+    url.searchParams.delete("search");
   }
 
-  const query = searchQuery.value.toLowerCase();
+  if (selectedCategory.value !== "all") {
+    url.searchParams.set("category", selectedCategory.value);
+  } else {
+    url.searchParams.delete("category");
+  }
 
-  return props.productsCatalog.filter((product) => {
-    return (
-      product.name.toLowerCase().includes(query) ||
-      product.manufacturer.toLowerCase().includes(query) ||
-      product.description.toLowerCase().includes(query)
+  window.history.pushState({}, "", url.toString());
+};
+
+onMounted(() => {
+  const params = parseQueryParams();
+  searchQuery.value = params.search;
+  selectedCategory.value = params.category;
+
+  window.addEventListener("popstate", handlePopState);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("popstate", handlePopState);
+});
+
+const handlePopState = () => {
+  const params = parseQueryParams();
+  searchQuery.value = params.search;
+  selectedCategory.value = params.category;
+};
+
+watch([searchQuery, selectedCategory], () => {
+  updateURL();
+});
+
+const filteredProducts = computed(() => {
+  let products = props.productsCatalog;
+
+  if (selectedCategory.value !== "all") {
+    products = products.filter(
+      (product) => product.category === selectedCategory.value
     );
-  });
+  }
+
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase();
+    products = products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(query) ||
+        product.manufacturer.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query)
+    );
+  }
+
+  return products;
 });
 </script>
 
@@ -41,6 +103,11 @@ const filteredProducts = computed(() => {
         v-model="searchQuery"
         placeholder="Search by name, manufacturer, or description..."
         :results-count="filteredProducts.length"
+      />
+
+      <CategoryFilter
+        v-model="selectedCategory"
+        :categories="categories"
       />
 
       <div
