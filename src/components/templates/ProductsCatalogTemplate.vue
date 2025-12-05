@@ -11,9 +11,13 @@ const props = defineProps<Props>();
 
 <template>
   <div class="products-catalog">
-    <pre>{{ props.productsCatalog }}</pre>
+    test
+<!--    <pre>{{ props.productsCatalog }}</pre>-->
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
+.products-catalog {
+  @apply bg-blue-900;
+}
 </style>
