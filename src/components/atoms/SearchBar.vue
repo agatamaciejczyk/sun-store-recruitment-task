@@ -68,13 +68,11 @@ const clearSearch = () => {
 
 .search-input {
   @apply w-full pl-12 pr-12 py-4 text-gray-900 bg-white border border-gray-100 shadow-sm rounded-lg;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   @apply placeholder:text-gray-400 transition-all duration-200;
 }
 
 .clear-button {
-  @apply absolute right-3 p-1 text-gray-400 hover:text-gray-600 transition-colors duration-200;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 rounded;
+  @apply absolute right-3 p-1 text-gray-400 hover:text-gray-600 transition-colors duration-200 rounded;
 }
 
 .search-results-info {

@@ -230,7 +230,7 @@ const goToPage = (page: number) => {
           />
         </aside>
 
-        <div class="products-section">
+        <div class="flex-1 min-w-0">
           <div
             v-if="filteredProducts.length > 0"
             class="products-catalog-grid"
@@ -261,18 +261,14 @@ const goToPage = (page: number) => {
 }
 
 .catalog-layout {
-  @apply flex flex-col lg:flex-row gap-6;
+  @apply flex flex-col gap-6 lg:flex-row;
 }
 
 .filters-sidebar {
-  @apply w-full lg:w-80 flex-shrink-0;
-}
-
-.products-section {
-  @apply flex-1 min-w-0;
+  @apply w-full flex-shrink-0 lg:w-80;
 }
 
 .products-catalog-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6 mb-8;
+  @apply grid grid-cols-1 gap-6 mb-8 md:grid-cols-2;
 }
 </style>

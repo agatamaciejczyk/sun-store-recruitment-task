@@ -33,7 +33,7 @@ const goToPage = (page: number) => {
         :key="page"
         @click="goToPage(page)"
         :class="[
-          'base-pagination-page',
+          'base-pagination-idle',
           currentPage === page ? 'base-pagination-page-active' : '',
         ]"
       >
@@ -60,15 +60,13 @@ const goToPage = (page: number) => {
   @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
   @apply bg-white text-gray-700 border border-gray-200;
   @apply hover:bg-gray-50 hover:border-gray-300;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
   @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white;
 }
 
-.base-pagination-page {
+.base-pagination-idle {
   @apply w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200;
   @apply bg-white text-gray-700 border border-gray-200;
   @apply hover:bg-gray-50 hover:border-gray-300;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
 
 .base-pagination-page-active {

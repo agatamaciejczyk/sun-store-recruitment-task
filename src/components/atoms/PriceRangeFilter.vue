@@ -98,7 +98,7 @@ const hasActiveFilter = () => {
 
 .reset-button {
   @apply text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1;
+  @apply rounded px-2 py-1;
 }
 
 .price-inputs {
@@ -115,7 +115,6 @@ const hasActiveFilter = () => {
 
 .price-input {
   @apply w-full px-4 py-2 text-sm border border-gray-200 rounded-lg;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   @apply transition-all duration-200;
 }
 
