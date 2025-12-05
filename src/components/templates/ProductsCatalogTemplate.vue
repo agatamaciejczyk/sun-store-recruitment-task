@@ -8,6 +8,7 @@ import NoResults from "@/components/atoms/NoResults.vue";
 import CategoryFilter from "@/components/atoms/CategoryFilter.vue";
 import ManufacturerFilter from "@/components/atoms/ManufacturerFilter.vue";
 import PriceRangeFilter from "@/components/atoms/PriceRangeFilter.vue";
+import BasePagination from "@/components/atoms/BasePagination.vue";
 
 // interfaces
 import type { Product } from "@/interfaces/Product.ts";
@@ -28,6 +29,8 @@ const priceRange = ref<{
   min: null,
   max: null,
 });
+const currentPage = ref(1);
+const itemsPerPage = 12;
 
 const categories = computed(() => {
   return ["all", ...new Set(props.productsCatalog.map((p) => p.category))].sort(
@@ -53,12 +56,16 @@ const parseQueryParams = () => {
   const priceMax = url.searchParams.get("priceMax")
     ? Number(url.searchParams.get("priceMax"))
     : null;
+  const page = url.searchParams.get("page")
+    ? Number(url.searchParams.get("page"))
+    : 1;
 
   return {
     search,
     category,
     manufacturer,
     priceRange: { min: priceMin, max: priceMax },
+    page,
   };
 };
 
@@ -95,6 +102,12 @@ const updateURL = () => {
     url.searchParams.delete("priceMax");
   }
 
+  if (currentPage.value !== 1) {
+    url.searchParams.set("page", currentPage.value.toString());
+  } else {
+    url.searchParams.delete("page");
+  }
+
   window.history.pushState({}, "", url.toString());
 };
 
@@ -104,6 +117,7 @@ onMounted(() => {
   selectedCategory.value = params.category;
   selectedManufacturer.value = params.manufacturer;
   priceRange.value = params.priceRange;
+  currentPage.value = params.page;
 
   window.addEventListener("popstate", handlePopState);
 });
@@ -118,9 +132,14 @@ const handlePopState = () => {
   selectedCategory.value = params.category;
   selectedManufacturer.value = params.manufacturer;
   priceRange.value = params.priceRange;
+  currentPage.value = params.page;
 };
 
 watch([searchQuery, selectedCategory, selectedManufacturer, priceRange], () => {
+  currentPage.value = 1;
+}, { deep: true });
+
+watch([searchQuery, selectedCategory, selectedManufacturer, priceRange, currentPage], () => {
   updateURL();
 }, { deep: true });
 
@@ -165,6 +184,22 @@ const filteredProducts = computed(() => {
 
   return products;
 });
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredProducts.value.length / itemsPerPage);
+});
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredProducts.value.slice(start, end);
+});
+
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
 </script>
 
 <template>
@@ -201,13 +236,19 @@ const filteredProducts = computed(() => {
             class="products-catalog-grid"
           >
             <ProductCard
-              v-for="(product, index) in filteredProducts"
+              v-for="(product, index) in paginatedProducts"
               :key="`product-card--${index}`"
               :product="product"
             />
           </div>
 
           <NoResults v-else />
+
+          <BasePagination
+            :current-page="currentPage"
+            :total-pages="totalPages"
+            @page-change="goToPage"
+          />
         </div>
       </div>
     </div>
@@ -232,6 +273,6 @@ const filteredProducts = computed(() => {
 }
 
 .products-catalog-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6 mb-8;
 }
 </style>
